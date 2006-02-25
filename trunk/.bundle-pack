@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bundlejar>
+<resource dst="" pattern=".*\.class" src="/bamja/out" type="0"/>
+<resource dst="" src="/bamja/res/metadata.xml" type="2"/>
+<resource dst="" src="/bamja/res/metadata.xsd" type="2"/>
+</bundlejar>

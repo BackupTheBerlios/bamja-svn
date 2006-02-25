@@ -1,0 +1,5 @@
+org.bamja.core
+org.bamja.core.annotations
+org.bamja.core.events
+org.bamja.core.impl
+org.bamja.core.interfaces
