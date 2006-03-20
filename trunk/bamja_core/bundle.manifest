@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-Name: bamja_core
+Bundle-Activator: org.bamja.core.impl.Activator
+Import-Package: org.osgi.framework;specification-version=1.2.0, org.kn
+ opflerfish.service.log, org.osgi.service.cm, org.xmlpull.v1
+Bundle-Vendor: Jens Kutzsche
+Bundle-SymbolicName: org.bamja.bamja_core
+Bundle-Version: 0.1.0
+Bundle-Category: bamja.core
+Export-Package: org.osgi.service.component
+Bundle-ContactAddress: http://bamja.berlios.de
+Bundle-SubversionURL: http://svn.berlios.de/svnroot/repos/bamja/
+Bundle-Description: The core of a Rich Client Platform for data acquis
+ ition programs. Its central task is the dependency injection.
