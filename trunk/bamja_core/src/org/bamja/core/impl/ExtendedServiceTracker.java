@@ -168,24 +168,32 @@ class ExtendedServiceTracker implements ServiceListener {
         objects = new HashMap();
     }
 
+    protected void scanInterfaces(Class c, ArrayList<String> classes) {
+        for (Class interfaceClass : c.getInterfaces()) {
+            classes.add(interfaceClass.getName());
+            scanInterfaces(interfaceClass, classes);
+        }
+    }
+
     public void serviceChanged(ServiceEvent event) {
         ServiceReference ref = event.getServiceReference();
 
         ArrayList<DuplexReference> duplexRefList = (ArrayList) ref
-                .getProperty(org.bamja.core.impl.Constants.DUPLEX_REFERENCE);
+                .getProperty(org.bamja.core.impl.Constants.DUPLEX_REFERENCES);
         if (duplexRefList != null) {
             Class implClass = this.config.getImplementationClass();
-            ArrayList<String> classes = new ArrayList<String>();
+            if (implClass == null)
+                return;
+
+            ArrayList<String> allClassnames = new ArrayList<String>();
             for (Class superClass = implClass; superClass != null; superClass = superClass
                     .getSuperclass()) {
-                classes.add(superClass.getName());
-            }
-            for (Class c : implClass.getInterfaces()) {
-                classes.add(c.getName());
+                allClassnames.add(superClass.getName());
+                scanInterfaces(superClass, allClassnames);
             }
 
             for (DuplexReference duplexRef : duplexRefList) {
-                if (!classes.contains(duplexRef.getInterfaceName())
+                if (!allClassnames.contains(duplexRef.getInterfaceName())
                         && !duplexRef.isOptional()) {
                     return;
                 }
@@ -259,70 +267,87 @@ class ExtendedServiceTracker implements ServiceListener {
         synchronized (tracking) {
             if (tracking.isEmpty()) {
                 tracking.add(0, ref);
-                if (cached != null) {
-                    objects.put(ref, cached);
-                }
-                return;
-            }
+            } else {
 
-            Object tmp = ref.getProperty(Constants.SERVICE_RANKING);
-            int refInt = (tmp instanceof Integer) ? ((Integer) tmp).intValue()
-                    : 0;
-            Long refId = (Long) ref.getProperty(Constants.SERVICE_ID);
-
-            int i = 0;
-            for (int n = tracking.size(); i < n; i++) {
-                ServiceReference challenger = (ServiceReference) tracking
-                        .get(i);
-                tmp = challenger.getProperty(Constants.SERVICE_RANKING);
-                int challengerInt = (tmp instanceof Integer) ? ((Integer) tmp)
+                Object tmp = ref.getProperty(Constants.SERVICE_RANKING);
+                int refInt = (tmp instanceof Integer) ? ((Integer) tmp)
                         .intValue() : 0;
+                Long refId = (Long) ref.getProperty(Constants.SERVICE_ID);
 
-                if (challengerInt < refInt) {
-                    break;
-                } else if (challengerInt == refInt) {
-                    Long challengerId = (Long) challenger
-                            .getProperty(Constants.SERVICE_ID);
-                    if (refId.compareTo(challengerId) < 0) {
+                int i = 0;
+                for (int n = tracking.size(); i < n; i++) {
+                    ServiceReference challenger = (ServiceReference) tracking
+                            .get(i);
+                    tmp = challenger.getProperty(Constants.SERVICE_RANKING);
+                    int challengerInt = (tmp instanceof Integer) ? ((Integer) tmp)
+                            .intValue()
+                            : 0;
+
+                    if (challengerInt < refInt) {
                         break;
+                    } else if (challengerInt == refInt) {
+                        Long challengerId = (Long) challenger
+                                .getProperty(Constants.SERVICE_ID);
+                        if (refId.compareTo(challengerId) < 0) {
+                            break;
+                        }
                     }
                 }
+                tracking.add(i, ref);
             }
-            tracking.add(i, ref);
-            objects.put(ref, cached);
+
+            if (cached != null) {
+                objects.put(ref, cached);
+            }
         }
     }
 
-    void ungetService(ServiceReference ref) {
+    void ungetService(Object bindObject, ServiceReference ref) {
         synchronized (tracking) {
-            objects.remove(ref);
+            Object removeObject = objects.remove(ref);
             context.ungetService(ref);
+
+            ArrayList<DuplexReference> duplexRefList = (ArrayList) ref
+                    .getProperty(org.bamja.core.impl.Constants.DUPLEX_REFERENCES);
+            if (removeObject != null && duplexRefList != null
+                    && removeObject instanceof DuplexFactoryComponent) {
+                ((DuplexFactoryComponent) removeObject)
+                        .ungetInstance(bindObject);
+            }
         }
     }
 
-    Object getService() {
+    Object getService(Object bindObject) {
         synchronized (tracking) {
             if (tracking.isEmpty()) {
                 return null;
             }
 
-            return getService((ServiceReference) tracking.get(0));
+            return getService(bindObject, (ServiceReference) tracking.get(0));
         }
     }
 
-    Object getService(ServiceReference ref) {
+    Object getService(Object bindObject, ServiceReference ref) {
         synchronized (tracking) {
+            Object retService = null;
             if (objects.containsKey(ref)) {
-                return objects.get(ref);
+                retService = objects.get(ref);
             } else {
-                Object o = context.getService(ref);
-                if (o != null) {
-                    objects.put(ref, o);
-                    return o;
+                retService = context.getService(ref);
+                if (retService != null) {
+                    objects.put(ref, retService);
                 }
             }
+
+            ArrayList<DuplexReference> duplexRefList = (ArrayList) ref
+                    .getProperty(org.bamja.core.impl.Constants.DUPLEX_REFERENCES);
+            if (duplexRefList != null
+                    && retService instanceof DuplexFactoryComponent) {
+                retService = ((DuplexFactoryComponent) retService)
+                        .getInstance(bindObject);
+            }
+            return retService;
         }
-        return null;
     }
 
     ServiceReference getServiceReference() {

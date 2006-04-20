@@ -94,7 +94,6 @@
 package org.bamja.core.impl;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

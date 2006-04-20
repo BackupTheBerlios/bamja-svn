@@ -246,7 +246,6 @@ public class Parser {
                 }
 
             } else if (isInSCRNamespace(parser, "reference", 2)) {
-
                 setReference(curr, parser, bundle);
 
             } else {
@@ -499,7 +498,14 @@ public class Parser {
                 compConf.addService(interfaceName);
                 skip(parser);
             } else if (isInSCRNamespace(parser, "duplex-reference", 3)) {
-                handleDuplexReference(compConf, parser, declaringBundle);
+                if (compConf.isServiceFactory() || compConf.isImmediate()
+                        || compConf.getFactory() != null) {
+                    throw new IllegalXMLException(
+                            "Element duplex-reference cannot be set when component "
+                                    + "is an immediate, a servicefactory or "
+                                    + "a factory component.");
+                }
+                setDuplexReference(compConf, parser, declaringBundle);
             } else if (isInSCRNamespace(parser, "virtual_provide", 3)) {
                 String virtualInterfaceName = null;
                 for (int i = 0; i < parser.getAttributeCount(); i++) {
@@ -517,7 +523,7 @@ public class Parser {
                 if (virtualInterfaceName == null)
                     missingAttr(parser, "name");
 
-                compConf.addVirtuallService(virtualInterfaceName);
+                compConf.addVirtualService(virtualInterfaceName);
                 skip(parser);
             } else {
                 skip(parser);
@@ -532,18 +538,6 @@ public class Parser {
                     "Service-tag did not contain a proper \"provides\"-tag.");
 
         }
-    }
-
-    private static void handleDuplexReference(Config compConf,
-            XmlPullParser parser, Bundle declaringBundle)
-            throws IllegalXMLException, XmlPullParserException, IOException {
-        if (!compConf.isServiceFactory()) {
-            throw new IllegalXMLException(
-                    "Attribute servicefactory must set \"true\" in service-tag "
-                            + "when the services should have references from "
-                            + "using services.");
-        }
-        setDuplexReference(compConf, parser, declaringBundle);
     }
 
     /*
@@ -760,14 +754,26 @@ public class Parser {
         BundleContext bc = Backdoor.getBundleContext(declaringBundle);
 
         try {
-            Filter filter;
+            StringBuffer sb = new StringBuffer();
+            sb.append("(|(");
+            sb.append(Constants.OBJECTCLASS);
+            sb.append("=");
+            sb.append(interfaceName);
+            sb.append(")(&(");
+            sb.append(Constants.OBJECTCLASS);
+            sb.append("=");
+            sb.append(DuplexFactoryComponent.class.getName());
+            sb.append(")(");
+            sb.append(org.bamja.core.impl.Constants.OBJECT_CLASS);
+            sb.append("=");
+            sb.append(interfaceName);
+            sb.append(")))");
             if (target != null) {
-                filter = bc.createFilter("(&(" + Constants.OBJECTCLASS + "="
-                        + interfaceName + ")" + target + ")");
-            } else {
-                filter = bc.createFilter("(" + Constants.OBJECTCLASS + "="
-                        + interfaceName + ")");
+                sb.insert(0, "(&");
+                sb.append(target);
+                sb.append(")");
             }
+            Filter filter = bc.createFilter(sb.toString());
 
             Reference ref = new Reference(name, filter, interfaceName,
                     optional, multiple, dynamic, bind, unbind, bc);
@@ -785,23 +791,11 @@ public class Parser {
             throws IllegalXMLException, XmlPullParserException, IOException {
 
         String interfaceName = null;
-        // String target = null;
         String bind = null;
         String unbind = null;
         boolean optional = false;
 
         for (int i = 0; i < parser.getAttributeCount(); i++) {
-
-            // if (parser.getAttributeName(i).equals("name")) {
-            // if (checkNMToken(parser.getAttributeValue(i))) {
-            // name = parser.getAttributeValue(i);
-            //
-            // } else {
-            // throw new IllegalXMLException("Attribute \""
-            // + parser.getAttributeName(i)
-            // + "\" in duplex-reference-tag is invalid.");
-            // }
-            // } else
             if (parser.getAttributeName(i).equals("interface")) {
                 if (checkToken(parser.getAttributeValue(i))) {
                     interfaceName = parser.getAttributeValue(i);
@@ -813,9 +807,6 @@ public class Parser {
                 }
             } else if (parser.getAttributeName(i).equals("optional")) {
                 optional = parseBoolean(parser, i);
-
-                // } else if (parser.getAttributeName(i).equals("target")) {
-                // target = parser.getAttributeValue(i);
 
             } else if (parser.getAttributeName(i).equals("bind")) {
                 bind = parser.getAttributeValue(i);
@@ -830,32 +821,13 @@ public class Parser {
 
         skip(parser);
 
-//        if (name == null)
-//            missingAttr(parser, "name");
-
         if (interfaceName == null)
             missingAttr(parser, "interface");
 
-        BundleContext bc = Backdoor.getBundleContext(declaringBundle);
-
-        // try {
-        // Filter filter;
-        // if (target != null) {
-        // filter = bc.createFilter("(&(" + Constants.OBJECTCLASS + "="
-        // + interfaceName + ")" + target + ")");
-        // } else {
-        // filter = bc.createFilter("(" + Constants.OBJECTCLASS + "="
-        // + interfaceName + ")");
-        // }
-
-        DuplexReference ref = new DuplexReference(interfaceName,
-                optional, bind, unbind, bc);
+        DuplexReference ref = new DuplexReference(interfaceName, optional,
+                bind, unbind, Backdoor.getBundleContext(declaringBundle));
 
         compConf.addDuplexReference(ref);
-        // } catch (InvalidSyntaxException e) {
-        // throw new IllegalXMLException(
-        // "Couldn't create filter for reference \"" + name + "\"", e);
-        // }
     }
 
     // TODO Check if the string follows the NMTOKEN in XML SCHEMA

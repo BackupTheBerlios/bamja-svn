@@ -97,11 +97,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Filter;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 
 /**
  * 
@@ -121,12 +117,6 @@ public class DuplexReference {
     private Config config;
 
     private BundleContext context = null;
-
-    private String filter = null;
-
-    private ServiceReference bound = null;
-
-    private boolean overrideUnsatisfied = false;
 
     public DuplexReference(String interfaceName, boolean optional,
             String bindMethodName, String unbindMethodName, BundleContext bc) {
@@ -155,51 +145,25 @@ public class DuplexReference {
                 unbindMethodName, context);
     }
 
-    public void bind(Object instance, Bundle bundle) {
-        if (bundle == null) {
-            return;
-        }
-        String filterString = "(&(" + org.osgi.framework.Constants.OBJECTCLASS
-                + "=" + interfaceName + ")" + "(" + Constants.BUNDLE_ID + "="
-                + bundle.getBundleId() + "))";
-        try {
-            Filter filter = this.context.createFilter(filterString);
-            ServiceReference[] refs = this.context.getServiceReferences(null,
-                    filter.toString());
-            bound = refs[0];
-            invokeEventMethod(instance, bindMethodName, bound);
-        } catch (InvalidSyntaxException e) {
-            Activator.log.error("Couldn't create filter for reference "
-                    + filterString + "\" used by component \""
-                    + config.getName() + "\". Got exception.", e);
+    public void bind(Object instance, Object bindObject) {
+        if (bindObject != null) {
+            invokeEventMethod(instance, bindMethodName, bindObject);
         }
     }
 
-    public void unbind(Object instance) {
-        if (this.bound == null) {
-            return;
+    public void unbind(Object instance, Object unbindObject) {
+        if (unbindObject != null) {
+            invokeEventMethod(instance, unbindMethodName, unbindObject);
         }
-        invokeEventMethod(instance, unbindMethodName, bound);
-        this.context.ungetService(bound);
     }
 
     private void invokeEventMethod(Object instance, String methodName,
-            ServiceReference ref) {
+            Object duplexObject) {
         if (methodName == null) {
             return;
         }
 
         Class instanceClass = instance.getClass();
-        Bundle bundle = ref.getBundle();
-
-        Class serviceClass = null;
-        try {
-            serviceClass = bundle.loadClass(getInterfaceName());
-        } catch (ClassNotFoundException e) {
-            Activator.log.error("Declarative Services could not load class", e);
-            return;
-        }
-
         while (instanceClass != null) {
             Method[] ms = instanceClass.getDeclaredMethods();
 
@@ -213,17 +177,11 @@ public class DuplexReference {
 
                     if (parms.length == 1) {
                         try {
-                            // if (ServiceReference.class.equals(parms[0])) {
-                            // ms[i].setAccessible(true);
-                            // ms[i].invoke(instance, new Object[] { ref });
-                            // return;
-                            // } else
-                            if (parms[0].isAssignableFrom(serviceClass)) {
-                                Object service = this.context.getService(ref);
+                            if (parms[0].isAssignableFrom(duplexObject
+                                    .getClass())) {
                                 ms[i].setAccessible(true);
-                                ms[i]
-                                        .invoke(instance,
-                                                new Object[] { service });
+                                ms[i].invoke(instance,
+                                        new Object[] { duplexObject });
                                 return;
                             }
                         } catch (IllegalAccessException e) {

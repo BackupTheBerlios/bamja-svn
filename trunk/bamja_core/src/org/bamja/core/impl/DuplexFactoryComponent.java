@@ -1,5 +1,5 @@
 /*
-  * This file is a part of the project "bamja". Bamja is a rich client platform
+ * This file is a part of the project "bamja". Bamja is a rich client platform
  * for data acquisition programs based on OSGi.
  * 
  * Copyright (C) 2006  Jens Kutzsche
@@ -54,10 +54,10 @@ package org.bamja.core.impl;
 
 /**
  * @author Jens Kutzsche
- * @since Version: 0.1.0 (18.03.2006)
+ * @since Version: 0.1.0 (27.03.2006)
  */
-public interface Constants {
-    String DUPLEX_REFERENCES = "org.bamja.core.duplexReferences";
-    String BUNDLE_ID = "org.bamja.core.bundleId";
-    String OBJECT_CLASS = "org.bamja.core.objectClass";
+public interface DuplexFactoryComponent {
+
+    public Object getInstance(Object duplexObject);
+    public void ungetInstance(Object duplexObject);
 }

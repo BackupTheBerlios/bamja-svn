@@ -7,7 +7,7 @@ Bundle-Vendor: Jens Kutzsche
 Bundle-SymbolicName: org.bamja.bamja_core
 Bundle-Version: 0.1.0
 Bundle-Category: bamja.core
-Export-Package: org.osgi.service.component
+Export-Package: org.osgi.service.component, org.bamja.core
 Bundle-ContactAddress: http://bamja.berlios.de
 Bundle-SubversionURL: http://svn.berlios.de/svnroot/repos/bamja/
 Bundle-Description: The core of a Rich Client Platform for data acquis

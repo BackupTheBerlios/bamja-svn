@@ -120,6 +120,8 @@ class Config {
 
     private boolean serviceFactory;
 
+    private boolean duplexFactory = false;
+
     private boolean immediate;
 
     private boolean registerService;
@@ -187,7 +189,9 @@ class Config {
 
         } else if (isServiceFactory()) {
             component = new ServiceFactoryComponent(this, overriddenProps);
-
+            
+        } else if (isDuplexFactory()) {
+            this.component = new DuplexFactoryComponentImpl(this, overriddenProps);
         } else if (isImmediate() || services.isEmpty()) {
             component = new ImmediateComponent(this, overriddenProps);
 
@@ -223,7 +227,6 @@ class Config {
     }
 
     public void referenceSatisfied() {
-
         if (isSatisfied() && component != null) {
             component.satisfied();
         }
@@ -235,22 +238,22 @@ class Config {
         }
     }
 
-    public void bindReferences(Object instance, Bundle bundle) {
+    public void bindReferences(Object instance, Object duplexObject) {
         for (int i = 0; i < references.size(); i++) {
             ((Reference) references.get(i)).bind(instance);
         }
         for (DuplexReference ref : this.duplexReferences) {
-           ref.bind(instance, bundle);
+           ref.bind(instance, duplexObject);
         }
     }
 
-    public void unbindReferences(Object instance) {
+    public void unbindReferences(Object instance, Object duplexObject) {
+        for (int i = this.duplexReferences.size() - 1; i >= 0; i--) {
+            this.duplexReferences.get(i).unbind(instance, duplexObject);
+        }
         for (int i = references.size() - 1; i >= 0; i--) {
             ((Reference) references.get(i)).unbind(instance);
         }
-        for (DuplexReference ref : this.duplexReferences) {
-            ref.unbind(instance);
-         }
     }
 
     public String[] getServices() {
@@ -260,6 +263,10 @@ class Config {
         String[] ret = new String[services.size()];
         services.toArray(ret);
         return ret;
+    }
+
+    public ArrayList getVirtualServices() {
+        return this.virtualServices;
     }
 
     public Dictionary getProperties() {
@@ -300,6 +307,10 @@ class Config {
 
     public boolean isServiceFactory() {
         return serviceFactory;
+    }
+
+    public boolean isDuplexFactory() {
+        return this.duplexFactory;
     }
 
     public String getFactory() {
@@ -355,13 +366,14 @@ class Config {
     public void addDuplexReference(DuplexReference ref) {
         ref.setConfig(this);
         this.duplexReferences.add(ref);
+        this.duplexFactory = true;
     }
 
     public void addService(String interfaceName) {
         services.add(interfaceName);
     }
 
-    public void addVirtuallService(String virtualService) {
+    public void addVirtualService(String virtualService) {
         this.virtualServices.add(virtualService);
     }
 
@@ -387,6 +399,10 @@ class Config {
 
     public void setServiceFactory(boolean isServiceFactory) {
         serviceFactory = isServiceFactory;
+    }
+
+    public void setDuplexFactory(boolean duplexFactory) {
+        this.duplexFactory = duplexFactory;
     }
 
     public void setFactory(String factory) {

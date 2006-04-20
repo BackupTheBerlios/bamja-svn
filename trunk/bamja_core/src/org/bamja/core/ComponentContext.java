@@ -1,18 +1,16 @@
 /*
- * $Header: /cvshome/build/org.osgi.service.component/src/org/osgi/service/component/ComponentContext.java,v 1.18 2005/08/06 00:49:36 hargrave Exp $
- *
  * Copyright (c) OSGi Alliance (2004, 2005). All Rights Reserved.
  * 
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 which accompanies this 
  * distribution, and is available at http://www.eclipse.org/legal/epl-v10.html.
  */
-
-package org.osgi.service.component;
+package org.bamja.core;
 
 import java.util.Dictionary;
 
 import org.osgi.framework.*;
+import org.osgi.service.component.ComponentInstance;
 
 /**
  * A Component Context object is used by a component instance to interact with
@@ -82,7 +80,7 @@ public interface ComponentContext {
 	 * @throws ComponentException If the Service Component Runtime catches an
 	 *         exception while activating the bound service.
 	 */
-	public Object locateService(String name);
+	public Object locateService(Object bindObject, String name);
 
 	/**
 	 * Returns the service object for the specified reference name and
@@ -100,7 +98,7 @@ public interface ComponentContext {
 	 * @throws ComponentException If the Service Component Runtime catches an
 	 *         exception while activating the bound service.
 	 */
-	public Object locateService(String name, ServiceReference reference);
+	public Object locateService(Object bindObject, String name, ServiceReference reference);
 
 	/**
 	 * Returns the service objects for the specified reference name.
@@ -114,7 +112,7 @@ public interface ComponentContext {
 	 * @throws ComponentException If the Service Component Runtime catches an
 	 *         exception while activating a bound service.
 	 */
-	public Object[] locateServices(String name);
+	public Object[] locateServices(Object bindObject, String name);
 
 	/**
 	 * Returns the <code>BundleContext</code> of the bundle which contains

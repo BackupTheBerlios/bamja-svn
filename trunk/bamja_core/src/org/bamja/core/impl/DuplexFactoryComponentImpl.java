@@ -48,64 +48,58 @@
  * Deutsche Übersetzung: http://www.gnu.de/lgpl-ger.html
  * 
  * Kontakt: Jens Kutzsche (genty@users.berlios.de)
- * 
- * *************************************************
- * *************************************************
- * 
- * This file based on the work of the Knopflerfish project, which was 
- * licensed under a BSD Software License and conains the follow informations:
- * 
- * Die Datei basiert auf der Arbeit des Knopflerfish Projekts, welche unter einer
- * BSD Lizenz veröffentlicht wurde und folgende Hinweise enthält:
- * 
- * -------------------------------------------------
- * Copyright (c) 2006, KNOPFLERFISH project
- * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following
- * conditions are met:
- *
- * - Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above
- *   copyright notice, this list of conditions and the following
- *   disclaimer in the documentation and/or other materials
- *   provided with the distribution.
- *
- * - Neither the name of the KNOPFLERFISH project nor the names of its
- *   contributors may be used to endorse or promote products derived
- *   from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+ **/
 package org.bamja.core.impl;
 
+import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
-class ServiceFactoryComponent extends DelayedComponent {
+/**
+ * @author Jens Kutzsche
+ * @since Version: 0.1.0 (27.03.2006)
+ */
+public class DuplexFactoryComponentImpl extends Component implements
+        DuplexFactoryComponent {
 
-    private Map<Bundle, Component> services = new HashMap<Bundle, Component>();
+    private HashMap<Object, Component> duplexObjectMap = new HashMap<Object, Component>();
 
-    public ServiceFactoryComponent(Config config, Dictionary overriddenProps) {
+    private int useCount = 0;
+
+    public DuplexFactoryComponentImpl(Config config, Dictionary overriddenProps) {
         super(config, overriddenProps);
+
+        String[] interfaces = config.getServices();
+        if (interfaces != null) {
+            setProperty(Constants.OBJECT_CLASS, interfaces);
+        }
+
+        ArrayList<DuplexReference> duplexRefList = this.config
+                .getDuplexReferences();
+        if (duplexRefList != null && duplexRefList.size() != 0)
+            setProperty(Constants.DUPLEX_REFERENCES, duplexRefList);
+    }
+
+    @Override
+    public void registerService() {
+        if (Activator.log.doDebug()) {
+            Activator.log
+                    .debug("DuplexFactoryComponentImpl.registerService() got BundleContext: "
+                            + bundleContext);
+        }
+
+        String[] interfaces = config.getServices();
+        if (interfaces == null) {
+            return;
+        }
+
+        serviceRegistration = Activator.bc.registerService(
+                DuplexFactoryComponent.class.getName(), this, config
+                        .getProperties());
     }
 
     @Override
@@ -119,28 +113,35 @@ class ServiceFactoryComponent extends DelayedComponent {
     }
 
     @Override
-    public synchronized Object getService(Bundle bundle, ServiceRegistration reg) {
-        Component component = services.get(bundle);
-
-        if (component == null) {
-            Config copy = config.copy();
-            copy.setServiceFactory(false);
-            copy.setShouldRegisterService(false);
-            component = copy.createComponent();
-            component.enable();
-            services.put(bundle, component);
-        }
-
-        return component.getService(bundle, reg);
+    public Object getService(Bundle bundle, ServiceRegistration reg) {
+        super.getService(bundle, reg);
+        return this;
     }
 
     @Override
-    public void ungetService(Bundle bundle, ServiceRegistration reg,
-            Object instance) {
-        super.ungetService(bundle, reg, instance);
-        Component component = services.remove(bundle);
+    public void ungetService(Bundle usingBundle, ServiceRegistration reg,
+            Object obj) {
+        super.ungetService(usingBundle, reg, obj);
+    }
+
+    public Object getInstance(Object duplexObject) {
+        Component component = this.duplexObjectMap.get(duplexObject);
+        if (component == null) {
+            Config copy = config.copy();
+            copy.setDuplexFactory(false);
+            copy.setShouldRegisterService(false);
+            component = copy.createComponent();
+            component.setDuplexObject(duplexObject);
+            component.enable();
+            this.duplexObjectMap.put(duplexObject, component);
+        }
+        return component.getService(null, serviceRegistration);
+    }
+
+    public void ungetInstance(Object duplexObject) {
+        Component component = this.duplexObjectMap.remove(duplexObject);
         if (component != null) {
-            component.ungetService(bundle, reg, instance);
+            component.deactivate();
             component.disable();
         }
     }

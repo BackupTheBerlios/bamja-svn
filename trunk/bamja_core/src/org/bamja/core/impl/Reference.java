@@ -98,17 +98,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Properties;
 
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.ServiceRegistration;
 
 public class Reference extends ExtendedServiceTracker {
 
@@ -134,8 +128,6 @@ public class Reference extends ExtendedServiceTracker {
     private Collection instances = new ArrayList();
 
     private boolean overrideUnsatisfied = false;
-    
-    private Map<ServiceReference,ServiceRegistration> regList = new HashMap<ServiceReference,ServiceRegistration>(); 
 
     public Reference(String refName, Filter filter, String interfaceName,
             boolean optional, boolean multiple, boolean dynamic,
@@ -154,7 +146,8 @@ public class Reference extends ExtendedServiceTracker {
     public void addedService(ServiceReference ref, Object service) {
         if (doneBound && multiple) {
             for (Iterator iter = instances.iterator(); iter.hasNext();) {
-                invokeEventMethod(iter.next(), bindMethodName, ref);
+                Object instance = iter.next();
+                invokeEventMethod(instance, bindMethodName, ref);
             }
         } else if (bound != null && !multiple) {
             ServiceReference newBound = getServiceReference();
@@ -164,7 +157,7 @@ public class Reference extends ExtendedServiceTracker {
                         Object instance = iter.next();
                         invokeEventMethod(instance, unbindMethodName, bound);
                         invokeEventMethod(instance, bindMethodName, newBound);
-                        ungetService(bound); // this is new.
+                        ungetService(instance, bound); // this is new.
                     }
                     bound = newBound;
                 } else { // Static: deactivate and reactivate
@@ -191,16 +184,18 @@ public class Reference extends ExtendedServiceTracker {
         } else { // Will continue to be satisfied.
             if (doneBound && multiple) {
                 for (Iterator iter = instances.iterator(); iter.hasNext();) {
-                    invokeEventMethod(iter.next(), unbindMethodName, ref);
+                    Object instance = iter.next();
+                    invokeEventMethod(instance, unbindMethodName, ref);
+                    ungetService(instance, ref);
                 }
-                ungetService(ref);
             } else if (ref.equals(bound)) { // The bound one is removed.
                 if (dynamic) { // Unbind and let removedService bind the new
                     // one.
                     for (Iterator iter = instances.iterator(); iter.hasNext();) {
-                        invokeEventMethod(iter.next(), unbindMethodName, ref);
+                        Object instance = iter.next();
+                        invokeEventMethod(instance, unbindMethodName, ref);
+                        ungetService(instance, ref);
                     }
-                    ungetService(ref);
                     bound = null;
                 } else { // Static. Deactivate and let removedService
                     // re-activate.
@@ -246,51 +241,14 @@ public class Reference extends ExtendedServiceTracker {
             if (serviceReferences != null) {
                 for (int i = 0; i < serviceReferences.length; i++) {
                     bound = serviceReferences[i];
-                    registerDuplexRef(bound, instance);
                     invokeEventMethod(instance, bindMethodName, bound);
                 }
             }
         } else { // unary
             bound = getServiceReference();
             if (bound != null) {
-                registerDuplexRef(bound, instance);
                 invokeEventMethod(instance, bindMethodName, bound);
             }
-        }
-    }
-
-    private void registerDuplexRef(ServiceReference ref, Object instance) {
-        ArrayList<DuplexReference> duplexRefList = (ArrayList) ref
-                .getProperty(org.bamja.core.impl.Constants.DUPLEX_REFERENCE);
-        if (duplexRefList != null) {
-            String[] interfaces = new String[duplexRefList.size()];
-            for (int i = 0; i < duplexRefList.size(); i++) {
-                DuplexReference duplexRef = duplexRefList.get(i);
-                if (duplexRef.isOptional()) {
-                    for (Class superClass = instance.getClass(); superClass != null; superClass = superClass
-                            .getSuperclass()) {
-                        if (superClass.getName().equals(
-                                duplexRef.getInterfaceName())) {
-                            interfaces[i] = duplexRef.getInterfaceName();
-                            break;
-                        }
-                    }
-                } else {
-                    interfaces[i] = duplexRef.getInterfaceName();
-                }
-            }
-
-            Properties props = new Properties();
-            props.put(Constants.BUNDLE_ID, this.context.getBundle()
-                    .getBundleId());
-            this.regList.put(ref, this.context.registerService(interfaces, instance, props));
-        }
-    }
-
-    private void unregisterDuplexRef(ServiceReference ref) {
-        ServiceRegistration reg = this.regList.get(ref);
-        if (reg != null) {
-            reg.unregister();
         }
     }
 
@@ -305,14 +263,12 @@ public class Reference extends ExtendedServiceTracker {
                 for (int i = serviceReferences.length - 1; i >= 0; i--) {
                     invokeEventMethod(instance, unbindMethodName,
                             serviceReferences[i]);
-                    ungetService(serviceReferences[i]);
-                    unregisterDuplexRef(serviceReferences[i]);
+                    ungetService(instance, serviceReferences[i]);
                 }
             }
         } else { // unary
             invokeEventMethod(instance, unbindMethodName, bound);
-            ungetService(bound);
-            unregisterDuplexRef(bound);
+            ungetService(instance, bound);
         }
         bound = null;
     }
@@ -333,17 +289,6 @@ public class Reference extends ExtendedServiceTracker {
         Class instanceClass = instance.getClass();
         Method method = null;
 
-        Bundle bundle = ref.getBundle(); // the bundle where the service is
-        // located
-        Class serviceClass = null;
-
-        try {
-            serviceClass = bundle.loadClass(getInterfaceName());
-        } catch (ClassNotFoundException e) {
-            Activator.log.error("Declarative Services could not load class", e);
-            return;
-        }
-
         while (instanceClass != null && method == null) {
             Method[] ms = instanceClass.getDeclaredMethods();
 
@@ -361,8 +306,8 @@ public class Reference extends ExtendedServiceTracker {
                                 ms[i].setAccessible(true);
                                 ms[i].invoke(instance, new Object[] { ref });
                                 return;
-                            } else if (parms[0].isAssignableFrom(serviceClass)) {
-                                Object service = getService(ref);
+                            } else if (parms[0].getName().equals(getInterfaceName())) {
+                                Object service = getService(instance, ref);
                                 ms[i].setAccessible(true);
                                 ms[i]
                                         .invoke(instance,

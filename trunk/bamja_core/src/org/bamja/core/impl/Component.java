@@ -93,26 +93,21 @@
  */
 package org.bamja.core.impl;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map;
 
+import org.bamja.core.ComponentContext;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
-
 import org.osgi.service.component.ComponentConstants;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentInstance;
 
 abstract class Component implements ServiceFactory {
@@ -122,6 +117,8 @@ abstract class Component implements ServiceFactory {
     private boolean active;
 
     private Object instance;
+
+    private Object duplexObject = null;
 
     protected BundleContext bundleContext;
 
@@ -134,11 +131,9 @@ abstract class Component implements ServiceFactory {
     protected Bundle usingBundle;
 
     private Hashtable effectiveProperties; // Properties from cm. These can be
-
-    // discarded.
+                                            // discarded.
 
     public Component(Config config, Dictionary overriddenProps) {
-
         this.config = config;
 
         instance = null;
@@ -218,8 +213,8 @@ abstract class Component implements ServiceFactory {
         }
 
         // 3. Bind the services. This should be sent to all the references.
-        config.bindReferences(instance, this.usingBundle);
-        
+        config.bindReferences(instance, getDuplexObject());
+
         try {
             Method method = klass.getDeclaredMethod("activate",
                     new Class[] { ComponentContext.class });
@@ -247,7 +242,7 @@ abstract class Component implements ServiceFactory {
                     e);
 
             // if this happens the component should not be activatated
-            config.unbindReferences(instance);
+            config.unbindReferences(instance, getDuplexObject());
             instance = null;
             componentContext = null;
 
@@ -263,7 +258,7 @@ abstract class Component implements ServiceFactory {
 
         if (!isActivated())
             return;
-
+        
         try {
             Class klass = instance.getClass();
             Method method = klass.getDeclaredMethod("deactivate",
@@ -291,8 +286,8 @@ abstract class Component implements ServiceFactory {
                                     + "\"deactivate\" in component "
                                     + config.getName(), e);
         }
-
-        config.unbindReferences(instance);
+        
+        config.unbindReferences(instance, getDuplexObject());
 
         instance = null;
         componentContext = null;
@@ -328,12 +323,6 @@ abstract class Component implements ServiceFactory {
         if (interfaces == null) {
             return;
         }
-
-        ArrayList<DuplexReference> duplexRef = this.config
-                .getDuplexReferences();
-        if (duplexRef != null && duplexRef.size() != 0)
-            effectiveProperties.put(Constants.DUPLEX_REFERENCE, duplexRef);
-
         serviceRegistration = bundleContext.registerService(interfaces, this,
                 effectiveProperties);
     }
@@ -389,19 +378,24 @@ abstract class Component implements ServiceFactory {
             return immutable;
         }
 
-        public Object locateService(String name) {
+        public Object locateService(Object bindObject, String name) {
             Reference ref = config.getReference(name);
-            return ref.getService();
+            return ref.getService(bindObject);
         }
 
-        public Object locateService(String name, ServiceReference sRef) {
+        public Object locateService(Object bindObject, String name, ServiceReference sRef) {
             Reference ref = config.getReference(name);
-            return ref.getService(sRef);
+            return ref.getService(bindObject, sRef);
         }
 
-        public Object[] locateServices(String name) {
+        public Object[] locateServices(Object bindObject, String name) {
             Reference ref = config.getReference(name);
-            return ref.getServiceReferences();
+            ServiceReference[] refs = ref.getServiceReferences();
+            Object[] ret = new Object[refs.length];
+            for (int i = 0; i < refs.length; i++) {
+                ret[i] = ref.getService(bindObject, refs[i]);
+            }
+            return ret;
         }
 
         public BundleContext getBundleContext() {
@@ -489,6 +483,7 @@ abstract class Component implements ServiceFactory {
         public void dispose() {
             unregisterService();
             deactivate();
+            disable();
         }
 
         public Object getInstance() {
@@ -512,6 +507,14 @@ abstract class Component implements ServiceFactory {
 
     public ComponentInstance getComponentInstance() {
         return componentInstance;
+    }
+
+    public Object getDuplexObject() {
+        return this.duplexObject;
+    }
+
+    public void setDuplexObject(Object duplexObject) {
+        this.duplexObject = duplexObject;
     }
 
     /*
