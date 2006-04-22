@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bundlejar>
 <resource dst="" pattern=".*\.class" src="/bamja_core/out" type="0"/>
-<resource dst="" src="/bamja_core/README.txt" type="2"/>
-<resource dst="" src="/bamja_core/resources/license-ger.html" type="2"/>
-<resource dst="" src="/bamja_core/resources/license.txt" type="2"/>
-<resource dst="" src="/bamja_core/resources/osgi_copyright.txt" type="2"/>
+<resource dst="" src="/bamja_core/src/main/resources" type="2"/>
 </bundlejar>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id>src</id>
+  <formats>
+    <format>tar.bz2</format>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+    <fileSet>
+      <excludes>
+        <exclude>out/</exclude>
+        <exclude>target/</exclude>
+      </excludes>
+    </fileSet>
+  </fileSets>
+</assembly>
+

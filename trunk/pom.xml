@@ -1,0 +1,46 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.bamja</groupId>
+  <version>0.1.0</version>
+  <artifactId>bamja</artifactId>
+  <packaging>pom</packaging>
+  <name>Base for modular Java applications</name>
+  <url>http://bamja.berlios.de</url>
+  <description>Bamja is a Rich Client Platform for data acquisition programs and provides a fast and flexible software development based on a service oriented architecture.</description>
+
+  <developers>
+    <developer>
+      <id>1</id>
+      <name>Jens Kutzsche</name>
+      <email>genty@users.berlios.de</email>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://svn.berlios.de/svnroot/repos/bamja/</url>
+  </scm>
+
+  <modules>
+    <module>bamja_core</module>
+  </modules>
+
+<build>
+  <plugins>
+    <plugin>
+<!-- 	use: mvn assembly:assembly -Dmaven.assembly.descriptor=src/main/assembly/bin.xml
+	or : mvn assembly:assembly -Dmaven.assembly.descriptor=src/main/assembly/src.xml -->
+      <artifactId>maven-assembly-plugin</artifactId>
+      <version>2.0-beta-1</version>
+    </plugin>
+  </plugins>
+</build>
+</project>

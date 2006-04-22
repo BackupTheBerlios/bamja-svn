@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <parent>
+    <groupId>org.bamja</groupId>
+    <artifactId>bamja</artifactId>
+    <version>0.1.0</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>bamja_core</artifactId>
+  <packaging>osgi-bundle</packaging>
+  <name>bamja core</name>
+  <version>0.1.0</version>    
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.0-beta-1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix.plugins</groupId>
+        <artifactId>maven-osgi-plugin</artifactId>
+        <extensions>true</extensions>
+        <version>0.8.0-SNAPSHOT</version>
+        <configuration>
+          <manifestFile>bundle.manifest</manifestFile>
+<!--          <osgiManifest>
+            <bundleActivator>com.my.company.Activator</bundleActivator>
+            <bundleName>Simple Bundle</bundleName>
+            <bundleDescription>simple bundle</bundleDescription>
+            <bundleVendor>Me</bundleVendor>
+          </osgiManifest>-->
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      	<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.core</artifactId>
+		<version>4.0</version>
+		<scope>provided</scope>
+    </dependency>
+    <dependency>
+		<groupId>org.osgi</groupId>
+		<artifactId>org.osgi.compendium</artifactId>
+		<version>4.0</version>
+		<scope>provided</scope>
+    </dependency>
+    <dependency>
+		<groupId>kxml2</groupId>
+		<artifactId>kxml2</artifactId>
+		<version>2.1.8</version>
+		<scope>provided</scope>
+    </dependency>
+    <dependency>
+		<groupId>org.knopflerfish.service</groupId>
+		<artifactId>log</artifactId>
+		<version>1.0.1</version>
+		<scope>provided</scope>
+	</dependency>
+  </dependencies>
+</project>
+

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" excluding="**/.svn/**|**/CVS/**" kind="src" path="src"/>
+	<classpathentry including="**/*.java" excluding="**/.svn/**;**/CVS/**" kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.knopflerfish.eclipse.core.EXECUTION_ENVIRONMENT_CONTAINER"/>
 	<classpathentry kind="con" path="org.knopflerfish.eclipse.core.FRAMEWORK_CONTAINER">
 		<attributes>
@@ -12,30 +12,18 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.knopflerfish.eclipse.core.BUNDLE_CONTAINER/org.knopflerfish.bundle.kxml">
-		<attributes>
-			<attribute value="kXML" name="bundle-name"/>
-			<attribute value="0.0.0" name="org.xmlpull.v1"/>
-		</attributes>
 		<accessrules>
 			<accessrule kind="accessible" pattern="org/xmlpull/v1/"/>
 			<accessrule kind="nonaccessible" pattern="**/*"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.knopflerfish.eclipse.core.BUNDLE_CONTAINER/org.knopflerfish.bundle.cm">
-		<attributes>
-			<attribute value="cm" name="bundle-name"/>
-			<attribute value="0.0.0" name="org.osgi.service.cm"/>
-		</attributes>
 		<accessrules>
 			<accessrule kind="accessible" pattern="org/osgi/service/cm/"/>
 			<accessrule kind="nonaccessible" pattern="**/*"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.knopflerfish.eclipse.core.BUNDLE_CONTAINER/org.knopflerfish.bundle.log">
-		<attributes>
-			<attribute value="Log-Service" name="bundle-name"/>
-			<attribute value="0.0.0" name="org.knopflerfish.service.log"/>
-		</attributes>
 		<accessrules>
 			<accessrule kind="accessible" pattern="org/knopflerfish/service/log/"/>
 			<accessrule kind="nonaccessible" pattern="**/*"/>

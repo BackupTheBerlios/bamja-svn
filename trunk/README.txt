@@ -1,15 +1,19 @@
-==== Informations about the use of bamja_core ====
+==== Informations about the use of bamja ====
 
 ** More informations can you find at
 ** http://bamja.berlios.de
 
-Bamja_core is an OSGi bundle and a subproject of bamja.
+Bamja is a collection of OSGi bundles.
+Every bundle is be located in a own subdirectory and is a subproject
+of bamja.
 
-The bundle is a project of the Knopflerfish Eclipse plug-in.
+The bundles are projects of the Knopflerfish Eclipse plug-in.
 See: http://knopflerfish.org/eclipse_plugin.html
-This plugin assists the develop of this bandle.
+This plugin assists the develop of the bandles.
 
-This subproject (bundle) is a maven project too.
+The complete bamja project is a maven2 project with a module for
+every subproject of bamja. Therewith every subproject (bundle) is 
+a maven project too.
 Maven assists the works for publication, but also the development 
 outside eclipse.
 
@@ -19,9 +23,10 @@ outside eclipse.
 	- the bundles kXML, cm and Log-Service from Knopflerfish 2
 
 === Running ===
-Bamja_core is a OSGi bundle for the Knopflerfish framework and
-used like such. You can be install and start it over a *.xargs file,
-the Knopflerfish Desktop or over the Knopflerfish console.
+The subprojects of bamja are OSGi bundles for the Knopflerfish
+framework and used like such. You can be install and start it 
+over a *.xargs file, the Knopflerfish Desktop or over the
+Knopflerfish console.
 
 You must start the required bundles too.
 
@@ -44,10 +49,7 @@ repositories in the active profile in your settings.xml.
 
 === Directories ===
 
- src			- the sourcedirectory of the bamja_core bundle 
-			under the rules	for the standard directory layout
-			for maven
+ bamja_core		- the core bundle of bamja (subproject)
+ src			- files for maven
 
- out			- the objectcode and the jar file of the bamja_core bundle
-			(Will created by eclipse automatic)
  target			- the directory for the output of maven
