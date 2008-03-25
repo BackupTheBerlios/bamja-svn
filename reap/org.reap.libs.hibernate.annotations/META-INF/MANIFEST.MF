@@ -1,0 +1,23 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: REAP Hibernate-Annotations library Plug-in
+Bundle-SymbolicName: org.reap.libs.hibernate.annotations
+Bundle-Version: 3.3.0
+Bundle-ClassPath: hibernate-commons-annotations.jar,
+ hibernate-annotations.jar
+Bundle-Vendor: Jens Kutzsche
+Export-Package: org.hibernate,
+ org.hibernate.annotations,
+ org.hibernate.annotations.common,
+ org.hibernate.annotations.common.annotationfactory,
+ org.hibernate.annotations.common.reflection,
+ org.hibernate.annotations.common.reflection.java,
+ org.hibernate.annotations.common.reflection.java.generics,
+ org.hibernate.annotations.common.util,
+ org.hibernate.cfg,
+ org.hibernate.cfg.annotations,
+ org.hibernate.cfg.annotations.reflection,
+ org.hibernate.mapping,
+ org.hibernate.type
+Require-Bundle: org.reap.libs.hibernate;visibility:=reexport
+Eclipse-BuddyPolicy: global

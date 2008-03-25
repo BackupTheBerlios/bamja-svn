@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<fragment>
+   <extension
+         name="MySQL"
+         point="org.reap.core.databaseSystems">
+      <databaseSystem id="org.reap.mysql" name="MySQL"
+            subprotocol="mysql">
+         <jdbcDriver
+               class="com.mysql.jdbc.Driver">
+         </jdbcDriver>
+         <jdbcDriver
+               class="org.gjt.mm.mysql.Driver">
+         </jdbcDriver>
+         <sqlDialect
+               class="org.hibernate.dialect.MySQLDialect"
+               ormapperID="org.reap.hibernate">
+         </sqlDialect>
+      </databaseSystem>
+   </extension>
+
+</fragment>

@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: REAP Core Plug-in
+Bundle-SymbolicName: org.reap.core;singleton:=true
+Bundle-Version: 0.0.3
+Bundle-ClassPath: core.jar,libs/ejb3-persistence.jar
+Bundle-Activator: org.reap.internal.core.Activator
+Bundle-Vendor: Jens Kutzsche
+Export-Package: javax.persistence,
+ javax.persistence.spi,
+ org.reap.core
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.databinding,
+ org.eclipse.core.databinding.beans,
+ org.eclipse.jface.databinding
+Eclipse-LazyStart: true

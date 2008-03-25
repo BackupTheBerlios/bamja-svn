@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.reap.libs.hibernate.feature_0.0.1.jar" id="org.reap.libs.hibernate.feature" version="0.0.1"/>
+   <feature url="features/org.reap.core.feature_0.0.2.jar" id="org.reap.core.feature" version="0.0.2"/>
+   <feature url="features/org.reap.core.feature_0.0.1.jar" id="org.reap.core.feature" version="0.0.1"/>
+   <feature url="features/org.reap.core.feature_0.0.3.jar" id="org.reap.core.feature" version="0.0.3"/>
+</site>

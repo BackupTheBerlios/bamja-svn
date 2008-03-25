@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: REAP MySQL wrapper and library Fragment
+Bundle-SymbolicName: org.reap.mysqlWrapper;singleton:=true
+Bundle-Version: 3.1.10
+Bundle-Vendor: Jens Kutzsche
+Fragment-Host: org.reap.core;bundle-version="0.0.1"
+Bundle-ClassPath: jdbc-mysql.jar
+Export-Package: com.mysql.jdbc,
+ com.mysql.jdbc.configs,
+ com.mysql.jdbc.jdbc2.optional,
+ com.mysql.jdbc.log,
+ com.mysql.jdbc.profiler,
+ com.mysql.jdbc.util,
+ org.gjt.mm.mysql

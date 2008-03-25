@@ -1,0 +1,3 @@
+#Tue Apr 03 18:45:25 CEST 2007
+defaultJUnitTestSuiteFactory=org.eclipse.hyades.test.plugin.junit.testSuite
+eclipse.preferences.version=1

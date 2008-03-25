@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: REAP Hibernate-Wrapper Plug-in
+Bundle-SymbolicName: org.reap.hibernateWrapper;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Vendor: Jens Kutzsche
+Require-Bundle: org.reap.core,
+ org.reap.libs.hibernate.entityManager
+Bundle-ClassPath: hibernateWrapper.jar

@@ -1,0 +1,360 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.reap.core">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.reap.core" id="bindingViews" name="Binding Views"/>
+      </appInfo>
+      <documentation>
+         [Enter description of this extension point.]
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="bindingPart" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="bindingPart">
+      <complexType>
+         <sequence>
+            <element ref="bindingField" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="targetEntity" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="bindToPart" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="bindingField">
+      <complexType>
+         <choice>
+            <sequence>
+               <element ref="binding" minOccurs="0" maxOccurs="unbounded"/>
+            </sequence>
+            <element ref="listInput"/>
+         </choice>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="noBinding" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="binding">
+      <complexType>
+         <sequence>
+            <choice minOccurs="0" maxOccurs="1">
+               <element ref="entityBinding"/>
+               <element ref="dataProcessingBinding"/>
+            </choice>
+            <element ref="updateStrategy" minOccurs="0" maxOccurs="2"/>
+         </sequence>
+         <attribute name="type">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="background">
+                  </enumeration>
+                  <enumeration value="editable">
+                  </enumeration>
+                  <enumeration value="enabled">
+                  </enumeration>
+                  <enumeration value="font">
+                  </enumeration>
+                  <enumeration value="foreground">
+                  </enumeration>
+                  <enumeration value="visible">
+                  </enumeration>
+                  <enumeration value="tooltipText">
+                  </enumeration>
+                  <enumeration value="textModify">
+                  </enumeration>
+                  <enumeration value="textNone">
+                  </enumeration>
+                  <enumeration value="textFocusOut">
+                  </enumeration>
+                  <enumeration value="text">
+                  </enumeration>
+                  <enumeration value="items">
+                  </enumeration>
+                  <enumeration value="min">
+                  </enumeration>
+                  <enumeration value="max">
+                  </enumeration>
+                  <enumeration value="selection">
+                  </enumeration>
+                  <enumeration value="singleSelectionIndex">
+                  </enumeration>
+                  <enumeration value="jfaceSingleSelection">
+                  </enumeration>
+                  <enumeration value="jfaceInput">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="returnMethod" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="onlyReturnObservable" type="boolean">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="viewerLabelProps" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="updateStrategy">
+      <complexType>
+         <attribute name="direction" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="modelToTarget">
+                  </enumeration>
+                  <enumeration value="targetToModel">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="policy">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="never">
+                  </enumeration>
+                  <enumeration value="onRequest">
+                  </enumeration>
+                  <enumeration value="update">
+                  </enumeration>
+                  <enumeration value="convert">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="converter" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.core.databinding.conversion.IConverter"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="afterGetValidator" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.core.databinding.validation.IValidator"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="afterConvertValidator" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.core.databinding.validation.IValidator"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="beforeSetValidator" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.core.databinding.validation.IValidator"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="provideDefaults" type="boolean">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="listInput">
+      <complexType>
+         <attribute name="databaseAccessID" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="viewerLabelProps" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="entityBinding">
+      <complexType>
+         <attribute name="targetProperty" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="targetSubEntity" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="dataProcessingBinding">
+      <complexType>
+         <attribute name="dataProcessingID" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         [Enter the first release in which this extension point appears.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         [Enter API information here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         
+      </documentation>
+   </annotation>
+
+</schema>

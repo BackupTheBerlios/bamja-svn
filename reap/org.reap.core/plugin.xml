@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="entities" name="Entities" schema="schema/entities.exsd"/>
+   <extension-point id="ormappers" name="Object-Relation-Mappers" schema="schema/ormappers.exsd"/>
+   <extension-point id="databaseSystems" name="Database Systems" schema="schema/databaseSystem.exsd"/>
+   <extension-point id="bindingParts" name="Binding Parts" schema="schema/bindingParts.exsd"/>
+   <extension-point id="databaseAccesses" name="Database Accesses" schema="schema/databaseAccesses.exsd"/>
+   <extension-point id="dataProcessings" name="Data Processing" schema="schema/dataProcessings.exsd"/>
+   <extension
+         name="REAP Core Startup (required)"
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.reap.internal.core.Startup">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.reap.internal.core.persistence.config.PersistenceConfigPage"
+            id="org.reap.core.persistenceConfigPage"
+            name="Datenbankverbindung">
+      </page>
+   </extension>
+
+</plugin>

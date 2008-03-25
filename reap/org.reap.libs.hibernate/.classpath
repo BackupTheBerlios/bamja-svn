@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="javassist.jar"/>
+	<classpathentry exported="true" kind="lib" path="antlr-2.7.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="commons-collections-2.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="commons-logging-1.0.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dom4j-1.6.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="ehcache-1.2.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="hibernate3.jar" sourcepath="/Hibernate3/src"/>
+	<classpathentry exported="true" kind="lib" path="jaxen-1.1-beta-7.jar"/>
+	<classpathentry exported="true" kind="lib" path="jdbc2_0-stdext.jar"/>
+	<classpathentry exported="true" kind="lib" path="jta.jar"/>
+	<classpathentry exported="true" kind="lib" path="log4j-1.2.11.jar"/>
+	<classpathentry exported="true" kind="lib" path="xml-apis.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

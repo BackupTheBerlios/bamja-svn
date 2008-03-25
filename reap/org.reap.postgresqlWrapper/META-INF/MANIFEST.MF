@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: REAP PostgreSQL wrapper and library Fragment
+Bundle-SymbolicName: org.reap.postgresqlWrapper;singleton:=true
+Bundle-Version: 7.4.5
+Bundle-Vendor: Jens Kutzsche
+Fragment-Host: org.reap.core;bundle-version="0.0.1"
+Bundle-ClassPath: jdbc3-postgresql.jar

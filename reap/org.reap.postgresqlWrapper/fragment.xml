@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<fragment>
+   <extension
+         name="PostgreSQL"
+         point="org.reap.core.databaseSystems">
+      <databaseSystem id="org.reap.postgresql" name="PostgreSQL"
+            subprotocol="postgresql">
+         <jdbcDriver
+               class="org.postgresql.Driver">
+         </jdbcDriver>
+         <sqlDialect
+               class="org.hibernate.dialect.PostgreSQLDialect"
+               ormapperID="org.reap.hibernate">
+         </sqlDialect>
+      </databaseSystem>
+   </extension>
+
+</fragment>
